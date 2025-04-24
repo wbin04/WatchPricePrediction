@@ -1,0 +1,11 @@
+- kiểm tra kiểu dữ liệu
+- chuẩn hóa các tên cột (không chứa đơn vị)
+- chuẩn hóa giá trị các col có dtype số (Price-USD, Water Resistance-metters)
+- chuẩn hóa thời gian Power Reserve (chuyển từ days-hours thành float)
+- fill data cho Compication (không/có nhiều chức năng) --- chưa xử lý dtype
+- chưa chuẩn hóa Brand, Model --- sử dụng Target Encoding
+- chuẩn hóa Case Material --- gộp các chất lượng khá tương đồng (có thể chỉnh sửa các gộp nếu có sự chênh lệch lớn về giá)
+- chuẩn hóa Strap Material --- gộp các chất lượng khá tương đồng
+- chưa tối ưu hàm chuẩn hóa dữ liệu (normalize_case_material và normalize_strap_material)
+- chuyển dtype category_col
+- fill data cho Power Reserve và Price --- sử dụng median
