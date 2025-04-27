@@ -25,3 +25,5 @@ RMSE: 2543.97
 R² score: 0.8934
 
 - cần cải thiện outliers
+
+- group các giá trị freq thấp
