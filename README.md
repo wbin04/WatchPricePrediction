@@ -84,27 +84,27 @@ To assess the performance of the regression models, the following evaluation met
   Ranges from 0 to 1, where a higher value indicates better model performance.  
   Formula:
 
-  $$
+  ```math
   R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}
-  $$
+  ```
 
 - **RMSE (Root Mean Squared Error)**  
   Represents the square root of the average squared differences between predicted and actual values.  
   Provides a measure of the model's prediction error in the same units as the target variable.  
   Formula:
 
-  $$
+  ```math
   RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n}(y_i - \hat{y}_i)^2}
-  $$
+  ```
 
 - **MAE (Mean Absolute Error)**  
   Represents the average of the absolute differences between predicted and actual values.  
   Provides a straightforward measure of prediction accuracy.  
   Formula:
 
-  $$
+  ```math
   MAE = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
-  $$
+  ```
 
 These metrics are calculated for each regression model to compare their performance and select the best model for predicting luxury watch prices.
 
