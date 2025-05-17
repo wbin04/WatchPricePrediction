@@ -6,11 +6,11 @@ This project aims to predict the price of luxury watches based on features such 
 
 ### 1. Data Preprocessing
 The `Data Preprocessing.ipynb` notebook handles data cleaning and initial preparation. Key steps include:
-- **Data Loading**: Data is loaded from `datasets/luxury_watches_preprocessed.csv`.
+- **Data Loading**: Data is loaded from `datasets/Luxury watch.csv`.
 - **Handling Missing Values**:
   - Columns with missing values, such as `Complications` and `Power Reserve`, are filled with default values or medians.
 - **Normalization**:
-  - Case material, strap material, dial color, and glass material are normalized to ensure consistency.
+  - `Case Material`, `Strap Material`, `Dial Color`, and `Crystal Material` are normalized to ensure consistency.
 - **Feature Transformation**:
   - `Water Resistance` is converted to an integer value.
   - `Price` is cleaned and converted to a numeric format.
