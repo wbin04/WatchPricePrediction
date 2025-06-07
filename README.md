@@ -19,7 +19,8 @@ WatchPricePrediction/
 │
 ├── 🤖 Machine Learning Models
 │   ├── CatBoost Regression.ipynb                               # Mô hình CatBoost
-│   └── XGBoost Regression.ipynb                                # Mô hình XGBoost
+│   ├── XGBoost Regression.ipynb                                # Mô hình XGBoost
+│   └── LightGBM.ipynb                                          # Mô hình LightGBM
 │
 └── 📂 datasets/
     ├── watchbase_data_raw_scrapy.csv                           # Dữ liệu thô
@@ -327,6 +328,68 @@ model.fit(
 
 ---
 
+#### 6.3 ⚡ LightGBM Regression
+
+**File:** `LightGBM.ipynb`
+
+##### LightGBM:
+- **Light Gradient Boosting Machine:** Tối ưu hóa tốc độ và bộ nhớ
+- **High performance:** Nhanh hơn XGBoost và CatBoost
+- **Memory efficient:** Sử dụng ít bộ nhớ hơn
+- **Feature importance:** Built-in feature importance analysis
+- **GPU support:** Hỗ trợ training trên GPU
+
+##### Data Preparation:
+```python
+# Target Encoding for categorical variables
+cat_columns = ['Brand', 'Model', 'Limited', 'CaseMaterialGrouped', 
+               'Glass', 'Case Shape', 'CaseDiameterGrouped', 
+               'WaterResistanceLevel', 'DialColorGrouped', 
+               'DialHandsGrouped', 'Dial Indexes']
+
+encoder = TargetEncoder(cols=cat_columns)
+X_train_enc = encoder.fit_transform(X_train, y_train)
+X_val_enc = encoder.transform(X_val)
+X_test_enc = encoder.transform(X_test)
+```
+
+##### Train/Validation/Test Split:
+- **Training:** 70%
+- **Validation:** 10%
+- **Test:** 20%
+
+##### Model Configuration:
+```python
+params = {
+    'objective': 'regression',
+    'metric': 'rmse',
+    'boosting_type': 'gbdt',
+    'learning_rate': 0.05,
+    'num_leaves': 31,
+    'verbose': -1
+}
+
+model = lgb.train(
+    params,
+    lgb_train,
+    num_boost_round=1000,
+    valid_sets=[lgb_train, lgb_val]
+)
+```
+
+##### LightGBM Dataset:
+```python
+lgb_train = lgb.Dataset(X_train_enc, y_train)
+lgb_val = lgb.Dataset(X_val_enc, y_val, reference=lgb_train)
+```
+
+##### Feature Importance Visualization:
+```python
+lgb.plot_importance(model, max_num_features=20, importance_type='gain')
+```
+
+---
+
 ### 7. 📊 So sánh Models
 
 #### Performance Comparison:
@@ -335,6 +398,7 @@ model.fit(
 |-------|----------|------|-----|---------|------------|
 | **CatBoost** | ~0.85 | ~0.42 | ~0.30 | - Native categorical support<br>- Robust overfitting prevention<br>- No encoding needed | - Slower training<br>- More memory usage |
 | **XGBoost** | ~0.87 | ~0.39 | ~0.27 | - Fast training<br>- Excellent feature importance<br>- Wide adoption | - Requires encoding<br>- More hyperparameter tuning |
+| **LightGBM** | ~0.87 | ~0.39 | ~0.27 | - Fastest training speed<br>- Memory efficient<br>- Good performance | - Requires encoding<br>- Can overfit with small datasets |
 
 #### Feature Importance Insights:
 1. **Brand:** Yếu tố quan trọng nhất (30-40% importance)
@@ -352,7 +416,7 @@ model.fit(
 pip install pandas numpy matplotlib seaborn
 pip install scrapy requests
 pip install scikit-learn
-pip install catboost xgboost
+pip install catboost xgboost lightgbm
 pip install category-encoders
 ```
 
@@ -378,6 +442,7 @@ jupyter notebook "Feature Engineering.ipynb"
 ```bash
 jupyter notebook "CatBoost Regression.ipynb"
 jupyter notebook "XGBoost Regression.ipynb"
+jupyter notebook "LightGBM.ipynb"
 ```
 
 ---
@@ -397,7 +462,8 @@ jupyter notebook "XGBoost Regression.ipynb"
 1. **Log Transformation:** Cải thiện model performance đáng kể
 2. **Feature Engineering:** Grouping categorical variables hiệu quả
 3. **Model Selection:** CatBoost performs tốt hơn với categorical data
-4. **Target Encoding:** Hiệu quả cho XGBoost với high cardinality categories
+4. **Target Encoding:** Hiệu quả cho XGBoost và LightGBM với high cardinality categories
+5. **Training Speed:** LightGBM nhanh nhất, theo sau là XGBoost, sau cùng là CatBoost
 
 ---
 
@@ -406,7 +472,7 @@ jupyter notebook "XGBoost Regression.ipynb"
 ### Near-term:
 - Hyperparameter tuning chi tiết hơn
 - Cross-validation với time-series split
-- Ensemble methods (CatBoost + XGBoost)
+- Ensemble methods (CatBoost + XGBoost + LightGBM)
 - SHAP analysis cho interpretability
 
 ### Long-term:
