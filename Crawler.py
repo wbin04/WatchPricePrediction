@@ -138,8 +138,9 @@ class WatchbaseDataPipeline:
     def close_spider(self, spider):
         if self.items:
             df = pd.DataFrame(self.items)
-            df.to_csv("watchbase_data_raw_scrapy.csv", index=False)
-            spider.logger.info(f"Saved {len(self.items)} watch models to watchbase_data_raw_scrapy.csv")
+            df.to_csv("datasets_etl/data_raw.csv", index=False)
+            df.to_csv("datasets_ml/data_raw.csv", index=False)
+            spider.logger.info(f"Saved {len(self.items)} watch models to datasets_etl/data_raw.csv and datasets_ml/data_raw.csv")
 
 def run_spider():
     """Run the spider with custom settings"""

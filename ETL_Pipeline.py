@@ -4,10 +4,16 @@ import re
 from sqlalchemy import create_engine
 
 class ETLPipeline:
-    def __init__(self, input_file='datasets/watchbase_data_raw.csv', output_file='datasets/watchbase_data_etl_transformed.csv'):
+    def __init__(self, 
+                 input_file='datasets_etl/data_raw.csv', 
+                 output_file='datasets_etl/data_transformed.csv', 
+                 output_dl='data_lake/watch_dl.parquet', 
+                 output_dwh='data_warehouse/watch_dwh.db'):
         self.data = None
         self.input_file = input_file
         self.output_file = output_file
+        self.output_dl = output_dl
+        self.output_dwh = output_dwh
 
     def data_preprocessing(self):
         # Simulate data preprocessing
@@ -56,9 +62,9 @@ class ETLPipeline:
 
         self.data = self.data[self.data['Case Diameter'] <= 60]
 
-        bins = [0, 30, 100, 200, 500, float('inf')]
-        labels = ['Low', 'Basic', 'Standard', 'Professional', 'Extreme']
-        self.data['WaterResistanceLevel'] = pd.cut(self.data['Water Resistance'], bins=bins, labels=labels, right=False)
+        resistance_bins = [0, 30, 100, 200, 500, float('inf')]
+        resistance_labels = ['Low', 'Basic', 'Standard', 'Professional', 'Extreme']
+        self.data['WaterResistanceLevel'] = pd.cut(self.data['Water Resistance'], bins=resistance_bins, labels=resistance_labels, right=False)
 
         self.data['Brand'] = self.data['Brand'].str.replace('-', ' ').str.lower()
         self.data['Brand'] = self.data['Brand'].str.replace('bell ross', 'bell & ross')
@@ -148,7 +154,7 @@ class ETLPipeline:
         # Simulate data extraction
         print("Extracting data...")
         self.data = pd.read_csv(self.input_file)
-        self.data.to_parquet("data_lake/watch_raw.parquet", index=False)
+        self.data.to_parquet(self.output_dl, index=False)
         return self.data
 
     def transform(self):
@@ -169,7 +175,7 @@ class ETLPipeline:
 
         self.data.to_csv(self.output_file, index=False)
 
-        engine = create_engine('sqlite:///data_warehouse/watch_dwh.db')
+        engine = create_engine(f'sqlite:///{self.output_dwh}')
         self.data.to_sql('watch_info', engine, index=False, if_exists='replace')
 
     def run_etl_pipeline(self):
@@ -180,8 +186,13 @@ class ETLPipeline:
         print("ETL Pipeline completed successfully.")
 
 if __name__ == "__main__":
-    input_file_path = 'datasets_etl/watchbase_data_raw.csv'
-    output_file_path = 'datasets_etl/watchbase_data_transformed.csv'
+    input_file_path = 'datasets_etl/data_raw.csv'
+    output_file_path = 'datasets_etl/data_transformed.csv'
+    output_dl_path = 'data_lake/watch_dl.parquet'
+    output_dwh_path = 'data_warehouse/watch_dwh.db'
 
-    etl_pipeline = ETLPipeline(input_file=input_file_path, output_file=output_file_path)
+    etl_pipeline = ETLPipeline(input_file=input_file_path, 
+                               output_file=output_file_path, 
+                               output_dl=output_dl_path, 
+                               output_dwh=output_dwh_path)
     etl_pipeline.run_etl_pipeline()
