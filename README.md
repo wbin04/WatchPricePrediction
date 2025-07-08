@@ -12,7 +12,8 @@ WatchPricePrediction/
 │   └── Crawler.py                                   # Web scraping với Scrapy
 │
 ├── 🔄 ETL Pipeline
-│   └── ETL_Pipeline.py                              # Complete ETL process
+│   ├── ETL_Pipeline_With_Pandas.py                  # ETL with Pandas
+│   ├── ETL_Pipeline_With_Spark.py                   # ETL with Apache Spark
 │
 ├── 📊 Data Analysis & Visualization
 │   ├── Descriptive_Statistics_Visualization.ipynb   # Thống kê mô tả & trực quan hóa
@@ -27,12 +28,15 @@ WatchPricePrediction/
 │
 ├── 📂 Data Storage
 │   ├── data_lake/                                   # Data Lake (Parquet format)
-│   │   └── watch_dl.parquet
+│   │   ├── watch_dl.parquet
+│   │   └── watch_dl_spark.parquet/
 │   ├── data_warehouse/                              # Data Warehouse (SQLite)
-│   │   └── watch_dwh.db
+│   │   ├── watch_dwh.db
+│   │   └── watch_dwh_spark.db
 │   ├── datasets_etl/                                # ETL processed data
 │   │   ├── data_raw.csv
-│   │   └── data_transformed.csv
+│   │   ├── data_transformed.csv
+│   │   └── data_transformed_spark.csv/
 │   └── datasets_ml/                                 # ML processed data
 │       ├── data_raw.csv
 │       ├── data_preprocessed.csv
@@ -78,7 +82,7 @@ python Crawler.py
 
 ### 2. 🔄 ETL Pipeline
 
-**File:** [`ETL_Pipeline.py`](ETL_Pipeline.py)
+**File:** [`ETL_Pipeline_With_Pandas.py`](ETL_Pipeline_With_Pandas.py)
 
 #### Mô tả:
 ETL Pipeline hoàn chỉnh thực hiện Extract, Transform, Load data với các thành phần:
@@ -99,13 +103,77 @@ ETL Pipeline hoàn chỉnh thực hiện Extract, Transform, Load data với cá
 
 #### Cách chạy:
 ```python
-python ETL_Pipeline.py
+python ETL_Pipeline_With_Pandas.py
 ```
 
 #### Kết quả:
 - **Data Lake:** [`data_lake/watch_dl.parquet`](data_lake/watch_dl.parquet)
 - **Data Warehouse:** [`data_warehouse/watch_dwh.db`](data_warehouse/watch_dwh.db)
 - **Processed Data:** [`datasets_etl/data_transformed.csv`](datasets_etl/data_transformed.csv)
+
+---
+
+### 🔄 ETL Pipeline với Apache Spark
+
+**Files:** [`ETL_Pipeline_With_Spark.py`](ETL_Pipeline_With_Spark.py)
+
+#### Mô tả:
+ETL Pipeline được nâng cấp sử dụng Apache Spark để xử lý dữ liệu quy mô lớn với hiệu năng cao. Spark ETL Pipeline có khả năng xử lý dữ liệu phân tán và tối ưu hóa cho big data.
+
+#### Ưu điểm của Spark ETL:
+- **Xử lý phân tán:** Có thể chạy trên cluster với nhiều nodes
+- **Tối ưu hóa bộ nhớ:** In-memory processing giảm I/O
+- **Lazy evaluation:** Chỉ thực hiện khi cần thiết
+- **Adaptive Query Execution:** Tự động tối ưu hóa query
+- **Columnar storage:** Hiệu quả với format Parquet
+
+#### Các tính năng nâng cao:
+
+##### Data Preprocessing với Spark DataFrame:
+- **Null value handling:** Sử dụng `fillna()` và `groupBy().count().orderBy(desc('count'))`
+- **Data type conversion:** Sử dụng `cast()` và `regexp_replace()`
+- **Column operations:** `withColumn()`, `withColumnRenamed()`, `drop()`
+
+##### Feature Engineering với Spark:
+- **Conditional transformations:** Sử dụng `when().otherwise()`
+- **String processing:** `regexp_replace()`, `split()`, `lower()`
+- **Mathematical operations:** `log1p()` cho log transformation
+- **Filtering:** `filter()` cho outlier removal
+
+#### Các transformation chính:
+
+##### 1. Data Cleaning:
+- **Missing value imputation:** Sử dụng mode cho categorical variables
+- **Data type conversion:** Convert string to numeric types
+- **Column standardization:** Rename và drop unnecessary columns
+
+##### 2. Feature Engineering:
+- **CaseMaterialGrouped:** Group similar materials
+- **WaterResistanceLevel:** Categorize resistance levels
+- **DialColorGrouped:** Group similar colors
+- **DialHandsGrouped:** Group similar hand styles
+- **CaseDiameterGrouped:** Size categories (XS, S, M, L, XL, XXL)
+- **LogPrice:** Log transformation for price
+
+##### 3. Data Validation:
+- **Outlier filtering:** Remove extreme values (Case Diameter > 60mm)
+- **Null checking:** Filter out null LogPrice values
+- **Data quality checks:** Verify transformations
+
+#### Kết quả Spark ETL:
+- **Data Lake (Spark):** [`data_lake/watch_dl_spark.parquet/`](data_lake/watch_dl_spark.parquet/)
+- **Data Warehouse (Spark):** [`data_warehouse/watch_dwh_spark.db`](data_warehouse/watch_dwh_spark.db)
+- **Processed Data (Spark):** [`datasets_etl/data_transformed_spark.csv/`](datasets_etl/data_transformed_spark.csv/)
+
+#### So sánh Pandas vs Spark ETL:
+
+| Aspect | Pandas ETL | Spark ETL |
+|--------|------------|-----------|
+| **Performance** | Single-machine | Distributed processing |
+| **Memory** | RAM limited | Scalable memory management |
+| **Data Size** | Small to medium | Big data capable |
+| **Complexity** | Simple API | More complex but powerful |
+| **Use Case** | Prototyping, small data | Production, large datasets |
 
 ---
 
@@ -476,6 +544,9 @@ pip install category-encoders>=2.5.0
 # Database & ETL
 pip install sqlalchemy>=1.4.0
 
+# Apache Spark (for big data processing)
+pip install pyspark>=3.3.0 findspark>=2.0.0
+
 # Jupyter notebook
 pip install jupyter>=1.0.0 ipykernel>=6.15.0
 
@@ -486,7 +557,7 @@ pip install pyarrow>=9.0.0 tqdm>=4.64.0
 #### Kiểm tra cài đặt:
 ```powershell
 # Verify installations
-python -c "import pandas, numpy, matplotlib, seaborn, scrapy, sklearn, catboost, xgboost, lightgbm, category_encoders, sqlalchemy, pyarrow; print('All packages installed successfully!')"
+python -c "import pandas, numpy, matplotlib, seaborn, scrapy, sklearn, catboost, xgboost, lightgbm, category_encoders, sqlalchemy, pyspark, findspark, pyarrow; print('All packages installed successfully!')"
 ```
 
 ### Chạy toàn bộ pipeline:
@@ -499,8 +570,11 @@ python Crawler.py
 
 #### 2. ETL Pipeline:
 ```powershell
-# Run complete ETL process
-python ETL_Pipeline.py
+# Run complete ETL process (Pandas)
+python ETL_Pipeline_.py
+
+# Or run Spark ETL process (for big data)
+python ETL_Pipeline_With_Spark.py
 ```
 
 #### 3. Data Analysis & Preprocessing:
@@ -582,17 +656,66 @@ jupyter notebook "ML_Pipeline_4_LightGBM.ipynb"
 
 ## 📄 Kiến trúc hệ thống
 
+### Traditional ETL Architecture (Pandas):
 ```
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Web Scraper │───>│ Data Lake   │───>│ ETL Pipeline│
-│ (Scrapy)    │    │ (Parquet)   │    │ (Python)    │
+│ Web Scraper │───>│ Data Lake   │───>│  Pandas ETL │
+│ (Scrapy)    │    │ (Parquet)   │    │  Pipeline   │
 └─────────────┘    └─────────────┘    └─────────────┘
                                              │
                                              ▼
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ ML Models   │<───│   Analytics │<───│ Data WH     │
+│ ML Models   │<───│  Analytics  │<───│ Data WH     │
 │ (Ensemble)  │    │ (Jupyter)   │    │ (SQLite)    │
 └─────────────┘    └─────────────┘    └─────────────┘
+```
+
+### Big Data Architecture (Spark):
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Web Scraper │───>│ Data Lake   │───>│  Spark ETL  │
+│ (Scrapy)    │    │ (Parquet)   │    │  Pipeline   │
+└─────────────┘    └─────────────┘    └─────────────┘
+                                             │
+                                             ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ ML Models   │<───│    Spark    │<───│ Data WH     │
+│ (Ensemble)  │    │  Analytics  │    │ (SQLite)    │
+│             │    │ (DataFrame) │    │             │
+└─────────────┘    └─────────────┘    └─────────────┘
+```
+
+### Hybrid Architecture:
+```
+                    ┌─────────────┐
+                    │ Web Scraper │
+                    │ (Scrapy)    │
+                    └─────────────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │ Data Lake   │
+                    │ (Parquet)   │
+                    └─────────────┘
+                           │
+                    ┌──────┴──────┐
+                    ▼             ▼
+            ┌─────────────┐ ┌─────────────┐
+            │ Pandas ETL  │ │ Spark ETL   │
+            │ (Small Data)│ │ (Big Data)  │
+            └─────────────┘ └─────────────┘
+                    │             │
+                    ▼             ▼
+            ┌─────────────────────────────┐
+            │       Data Warehouse        │
+            │          (SQLite)           │
+            └─────────────────────────────┘
+                           │
+                           ▼
+            ┌─────────────────────────────┐
+            │         ML Pipeline         │
+            │ (CatBoost/XGBoost/LightGBM) │
+            └─────────────────────────────┘
 ```
 
 ## 📄 License

@@ -3,7 +3,7 @@ import numpy as np
 import re
 from sqlalchemy import create_engine
 
-class ETLPipeline:
+class PandasETLPipeline:
     def __init__(self, 
                  input_file='datasets_etl/data_raw.csv', 
                  output_file='datasets_etl/data_transformed.csv', 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     output_dl_path = 'data_lake/watch_dl.parquet'
     output_dwh_path = 'data_warehouse/watch_dwh.db'
 
-    etl_pipeline = ETLPipeline(input_file=input_file_path, 
+    etl_pipeline = PandasETLPipeline(input_file=input_file_path, 
                                output_file=output_file_path, 
                                output_dl=output_dl_path, 
                                output_dwh=output_dwh_path)

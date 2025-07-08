@@ -31,3 +31,7 @@ ipykernel>=6.15.0
 # Additional utilities
 pyarrow>=9.0.0  # For parquet file support
 tqdm>=4.64.0    # Progress bars
+
+# Apache Spark (for big data processing)
+pyspark>=3.3.0 
+findspark>=2.0.0
